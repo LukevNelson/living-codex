@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Living Codex</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=IM+Fell+English:ital@0;1&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="codex.css">
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       TOPBAR
+  ══════════════════════════════════════════ -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-brand">
+      <div class="brand-glyph">✦</div>
+      <div class="brand-text">
+        <span class="brand-title">The Living Codex</span>
+        <span class="brand-sub">Investigation &amp; Knowledge Engine</span>
+      </div>
+    </div>
+
+    <nav class="tab-nav" role="navigation" aria-label="Main tabs">
+      <button class="tab-btn active" data-tab="investigate" title="[I] Investigate">
+        <span class="tab-icon">⚔</span><span class="tab-label">Investigate</span>
+      </button>
+      <button class="tab-btn" data-tab="journal" title="[J] Journal">
+        <span class="tab-icon">📖</span><span class="tab-label">Journal</span>
+      </button>
+      <button class="tab-btn" data-tab="network" title="[N] NPC Network">
+        <span class="tab-icon">🕸</span><span class="tab-label">Network</span>
+      </button>
+      <button class="tab-btn" data-tab="board" title="[B] Evidence Board">
+        <span class="tab-icon">📌</span><span class="tab-label">Evidence Board</span>
+      </button>
+    </nav>
+
+    <div class="topbar-right">
+      <div class="live-indicator" id="live-indicator">
+        <div class="live-dot"></div>
+        <span class="live-label">Live</span>
+      </div>
+      <div class="sync-info">
+        <span id="sync-label">Awaiting events…</span>
+        <span id="sync-time" class="sync-time"></span>
+      </div>
+      <button class="settings-btn" id="settings-btn" title="Settings">⚙</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════
+       SHELL
+  ══════════════════════════════════════════ -->
+  <div class="shell" id="shell">
+
+    <!-- ════════════════════════════════════
+         TAB: INVESTIGATE
+    ════════════════════════════════════ -->
+    <div class="tab-content active" id="tab-investigate">
+
+      <!-- Left sidebar: item list + inventory -->
+      <nav class="sidebar-left" id="sidebar-left">
+
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">
+            <span>Investigations</span>
+            <button class="sidebar-add-btn" id="sidebar-add-btn" title="Open new investigation">＋</button>
+          </div>
+          <div id="item-list"></div>
+        </div>
+
+        <div class="sidebar-section sidebar-inventory-section">
+          <div class="sidebar-section-label">Inventory</div>
+          <div id="inventory-panel">
+            <div class="inventory-empty">Nothing in hand.</div>
+          </div>
+        </div>
+
+      </nav>
+
+      <!-- Main panel: active codex entry -->
+      <main class="main" id="main-panel">
+        <div class="empty-state" id="main-empty">
+          <div class="empty-glyph">✦</div>
+          <div class="empty-title">The Living Codex</div>
+          <div class="empty-sub">Select an investigation from the left, or open a new one.</div>
+          <button class="empty-cta" id="empty-cta">Open First Investigation</button>
+        </div>
+      </main>
+
+      <!-- Right sidebar: simulator + controls -->
+      <aside class="sidebar-right" id="sidebar-right">
+
+        <div class="sim-section">
+          <div class="sim-label">Unreal Engine Simulator</div>
+          <div class="sim-desc">In production, Blueprint HTTP nodes fire these events automatically. Click to simulate.</div>
+        </div>
+
+        <div class="sim-section">
+          <div class="sim-label">Discovery Sources</div>
+          <div id="source-buttons"></div>
+        </div>
+
+        <div class="sim-divider"></div>
+
+        <div class="sim-section">
+          <div class="sim-label">NPC Knowledge</div>
+          <div id="npc-grid"></div>
+        </div>
+
+        <div class="sim-divider"></div>
+
+        <div class="sim-section">
+          <div class="sim-label">Gate History</div>
+          <div id="gate-log"></div>
+        </div>
+
+        <div class="sim-divider"></div>
+
+        <div class="sim-section">
+          <div class="sim-label">API Payload</div>
+          <div class="api-mock" id="api-mock">
+            <span class="api-waiting">// Waiting for first event…</span>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+
+    <!-- ════════════════════════════════════
+         TAB: JOURNAL
+    ════════════════════════════════════ -->
+    <div class="tab-content" id="tab-journal">
+
+      <div class="journal-toolbar">
+        <div class="journal-filters" id="journal-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="active">Active</button>
+          <button class="filter-btn" data-filter="contested">⚠ Contested</button>
+          <button class="filter-btn" data-filter="resolved">✓ Resolved</button>
+          <button class="filter-btn" data-filter="archived">⊘ Archived</button>
+          <button class="filter-btn" data-filter="echoing">~ Echoing</button>
+        </div>
+        <div class="journal-search-wrap">
+          <span class="search-icon">⌕</span>
+          <input class="journal-search" id="journal-search" type="text" placeholder="Search entries, logs, notes…" autocomplete="off">
+          <button class="search-clear" id="search-clear" style="display:none;">✕</button>
+        </div>
+        <button class="new-investigation-btn" id="new-investigation-btn">＋ New Investigation</button>
+      </div>
+
+      <div class="journal-body">
+        <div id="journal-entries"></div>
+      </div>
+
+    </div>
+
+    <!-- ════════════════════════════════════
+         TAB: NPC NETWORK
+    ════════════════════════════════════ -->
+    <div class="tab-content" id="tab-network">
+      <div class="network-wrap">
+        <div class="network-header">
+          <div class="network-title">World NPC Knowledge Network</div>
+          <div class="network-sub">Current knowledge state of every known character. Items you have taught them are marked.</div>
+        </div>
+        <div class="network-grid" id="network-grid"></div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════
+         TAB: EVIDENCE BOARD
+    ════════════════════════════════════ -->
+    <div class="tab-content" id="tab-board">
+      <div class="board-wrap" id="board-wrap">
+        <div class="board-header">
+          <div class="board-title">Evidence Board</div>
+          <div class="board-sub">All investigations. Pinned by status. Connections show shared sources and NPC relationships.</div>
+        </div>
+        <div class="board-canvas" id="board-canvas"></div>
+      </div>
+    </div>
+
+  </div><!-- /.shell -->
+
+  <!-- ══════════════════════════════════════════
+       TOAST
+  ══════════════════════════════════════════ -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL: Settings
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-settings" style="display:none;">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <div class="modal-title">Settings</div>
+        <button class="modal-close" data-close="modal-settings">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-label">Backend Mode</div>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-mode="demo">Demo (simulated storage)</button>
+          <button class="toggle-btn" data-mode="live">Live (real backend)</button>
+        </div>
+        <div class="field-label" style="margin-top:14px;">Backend URL</div>
+        <input class="field-input" id="backend-url" type="text" placeholder="https://your-server.com/api" value="">
+        <div class="field-label" style="margin-top:14px;">Player ID</div>
+        <input class="field-input" id="player-id" type="text" placeholder="player_001" value="player_001">
+        <div class="settings-note">In demo mode all data is shared via the Claude storage layer. Switch to live mode to point at your own Node.js backend.</div>
+        <div class="modal-actions">
+          <button class="modal-cancel" data-close="modal-settings">Close</button>
+          <button class="modal-confirm" id="settings-save">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL: New Investigation
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-new" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Open New Investigation</div>
+        <button class="modal-close" data-close="modal-new">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="field-label">Item Name or Description</div>
+        <input class="field-input" id="new-item-name" type="text" placeholder="What did you find, witness, or hear about?" autocomplete="off">
+
+        <div class="field-label mt">Entry Type</div>
+        <div class="entry-type-grid">
+          <button class="entry-type-btn active" data-type="physical">
+            <span>📦</span><span>Physical Find</span>
+            <small>You hold the object</small>
+          </button>
+          <button class="entry-type-btn" data-type="echo">
+            <span>🌫</span><span>Environmental Echo</span>
+            <small>Something felt wrong before you found anything</small>
+          </button>
+          <button class="entry-type-btn" data-type="witnessed">
+            <span>👁</span><span>Witnessed Event</span>
+            <small>You saw it used or referenced</small>
+          </button>
+          <button class="entry-type-btn" data-type="rumour">
+            <span>💬</span><span>Rumour</span>
+            <small>Someone told you something exists</small>
+          </button>
+        </div>
+
+        <div class="field-label mt">Icon</div>
+        <div class="icon-grid" id="icon-grid">
+          <button class="icon-btn active" data-icon="🗡️">🗡️</button>
+          <button class="icon-btn" data-icon="📿">📿</button>
+          <button class="icon-btn" data-icon="📜">📜</button>
+          <button class="icon-btn" data-icon="🏺">🏺</button>
+          <button class="icon-btn" data-icon="💀">💀</button>
+          <button class="icon-btn" data-icon="🔮">🔮</button>
+          <button class="icon-btn" data-icon="🗝️">🗝️</button>
+          <button class="icon-btn" data-icon="📖">📖</button>
+          <button class="icon-btn" data-icon="⚗️">⚗️</button>
+          <button class="icon-btn" data-icon="🧿">🧿</button>
+          <button class="icon-btn" data-icon="⚔️">⚔️</button>
+          <button class="icon-btn" data-icon="🕯️">🕯️</button>
+          <button class="icon-btn" data-icon="🪬">🪬</button>
+          <button class="icon-btn" data-icon="🦴">🦴</button>
+          <button class="icon-btn" data-icon="🌑">🌑</button>
+          <button class="icon-btn" data-icon="🩸">🩸</button>
+        </div>
+
+        <div class="field-label mt">First Observation</div>
+        <textarea class="field-textarea" id="new-item-note" placeholder="What do you know so far? Write it in your own words."></textarea>
+
+        <div class="modal-actions">
+          <button class="modal-cancel" data-close="modal-new">Cancel</button>
+          <button class="modal-confirm" id="modal-new-confirm">Open Investigation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL: Archive Investigation
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-abandon" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Archive Investigation</div>
+        <button class="modal-close" data-close="modal-abandon">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro">Before this investigation is archived, the codex asks you to record why you are closing it. This record is permanent.</p>
+
+        <div class="field-label mt">Reason for Closing</div>
+        <div class="abandon-grid" id="abandon-grid">
+          <button class="abandon-btn" data-reason="distraction">
+            <span class="abandon-icon">🌀</span>
+            <div>
+              <div class="abandon-label">Distraction</div>
+              <div class="abandon-desc">Moving on. No resolution found or sought.</div>
+            </div>
+          </button>
+          <button class="abandon-btn" data-reason="apprehension">
+            <span class="abandon-icon">🚪</span>
+            <div>
+              <div class="abandon-label">Apprehension</div>
+              <div class="abandon-desc">I sense what the next answer will cost. I am not ready to pay it.</div>
+            </div>
+          </button>
+          <button class="abandon-btn" data-reason="bribery">
+            <span class="abandon-icon">💰</span>
+            <div>
+              <div class="abandon-label">Bribery</div>
+              <div class="abandon-desc">Someone offered me something to stop asking questions.</div>
+            </div>
+          </button>
+          <button class="abandon-btn" data-reason="coercion">
+            <span class="abandon-icon">⚠️</span>
+            <div>
+              <div class="abandon-label">Coercion</div>
+              <div class="abandon-desc">I was threatened or forcibly prevented from continuing.</div>
+            </div>
+          </button>
+          <button class="abandon-btn" data-reason="extortion">
+            <span class="abandon-icon">🔒</span>
+            <div>
+              <div class="abandon-label">Extortion</div>
+              <div class="abandon-desc">Something I value is being held against this investigation.</div>
+            </div>
+          </button>
+          <button class="abandon-btn" data-reason="protective">
+            <span class="abandon-icon">🛡️</span>
+            <div>
+              <div class="abandon-label">Protective Halt</div>
+              <div class="abandon-desc">Continuing would harm someone I have chosen to protect.</div>
+            </div>
+          </button>
+        </div>
+
+        <div class="field-label mt">Your Words</div>
+        <textarea class="field-textarea" id="abandon-note" placeholder="Record your reason in your own words. This is for you, not for the system. No one else will read it."></textarea>
+
+        <div class="modal-actions">
+          <button class="modal-cancel" data-close="modal-abandon">Keep Investigating</button>
+          <button class="modal-confirm danger" id="abandon-confirm">Archive Investigation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL: Reconstruction Event
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay reconstruction-overlay" id="modal-reconstruction" style="display:none;">
+    <div class="reconstruction-modal">
+      <div class="reconstruction-header">
+        <div class="reconstruction-eyebrow">⚡ Reconstruction Event — Memory Unlocked</div>
+        <div class="reconstruction-item-name" id="recon-item-name"></div>
+      </div>
+      <div class="reconstruction-body" id="recon-body"></div>
+      <div class="reconstruction-footer">
+        <div class="recon-classification" id="recon-classification"></div>
+        <button class="recon-close-btn" id="recon-close">Close Memory</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="codex.js"></script>
+</body>
+</html>
